@@ -25,6 +25,7 @@ public class FormDataPartImpl implements FormDataPart {
   private final String mediaType;
   private final String pathname;
   private final Boolean text;
+  private final Object byteBuf;
 
   public FormDataPartImpl(String name, String value) {
     if (name == null) {
@@ -39,6 +40,7 @@ public class FormDataPartImpl implements FormDataPart {
     this.pathname = null;
     this.mediaType = null;
     this.text = null;
+    this.byteBuf = null;
   }
 
   public FormDataPartImpl(String name, String filename, String pathname, String mediaType, boolean text) {
@@ -60,9 +62,30 @@ public class FormDataPartImpl implements FormDataPart {
     this.pathname = pathname;
     this.mediaType = mediaType;
     this.text = text;
+    this.byteBuf = null;
   }
 
-  @Override
+  public FormDataPartImpl(String name, String filename, String mediaType, boolean text, Object byteBuf) {
+    if (name == null) {
+      throw new NullPointerException();
+    }
+    if (filename == null) {
+      throw new NullPointerException();
+    }
+    if (mediaType == null) {
+      throw new NullPointerException();
+    }
+    this.name = name;
+    this.value = null;
+    this.filename = filename;
+    this.pathname = null;
+    this.mediaType = mediaType;
+    this.text = text;
+    this.byteBuf = byteBuf;
+  }
+
+
+    @Override
   public String name() {
     return name;
   }
@@ -100,5 +123,15 @@ public class FormDataPartImpl implements FormDataPart {
   @Override
   public Boolean isText() {
     return text;
+  }
+
+  @Override
+  public Object buffer() {
+    return byteBuf;
+  }
+
+  @Override
+  public Boolean isBuffer() {
+    return byteBuf != null;
   }
 }

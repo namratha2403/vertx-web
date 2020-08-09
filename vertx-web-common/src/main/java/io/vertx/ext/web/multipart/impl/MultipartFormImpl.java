@@ -45,6 +45,12 @@ public class MultipartFormImpl implements MultipartForm {
   }
 
   @Override
+  public MultipartForm binaryDataUpload(String name, String filename, String mediaType, Object byteBuf) {
+    parts.add(new FormDataPartImpl(name, filename, mediaType, false, byteBuf));
+    return this;
+  }
+
+  @Override
   public Iterator<FormDataPart> iterator() {
     return parts.iterator();
   }

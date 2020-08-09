@@ -18,10 +18,8 @@ package io.vertx.ext.web.client.impl;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.multipart.DefaultHttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpPostRequestEncoder;
 import io.vertx.core.Context;
 import io.vertx.core.Handler;
@@ -31,6 +29,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.impl.headers.HeadersAdaptor;
 import io.vertx.core.streams.ReadStream;
 import io.vertx.core.streams.impl.InboundBuffer;
+import io.vertx.ext.web.client.impl.encoders.AbstractMultipartFormEncoder;
 import io.vertx.ext.web.multipart.FormDataPart;
 import io.vertx.ext.web.multipart.MultipartForm;
 
@@ -46,7 +45,7 @@ public class MultipartFormUpload implements ReadStream<Buffer> {
   private static final UnpooledByteBufAllocator ALLOC = new UnpooledByteBufAllocator(false);
 
   private DefaultFullHttpRequest request;
-  private HttpPostRequestEncoder encoder;
+  private AbstractMultipartFormEncoder encoder;
   private Handler<Throwable> exceptionHandler;
   private Handler<Buffer> dataHandler;
   private Handler<Void> endHandler;
@@ -66,19 +65,17 @@ public class MultipartFormUpload implements ReadStream<Buffer> {
       HttpVersion.HTTP_1_1,
       io.netty.handler.codec.http.HttpMethod.POST,
       "/");
-    this.encoder = new HttpPostRequestEncoder(
-      new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE),
-      request,
-      multipart,
-      HttpConstants.DEFAULT_CHARSET,
-      encoderMode);
+    this.encoder = CreateEncoder.from(request, multipart, encoderMode);
     for (FormDataPart formDataPart : parts) {
       if (formDataPart.isAttribute()) {
         encoder.addBodyAttribute(formDataPart.name(), formDataPart.value());
-      } else {
+      } else if(!formDataPart.isBuffer()){
         encoder.addBodyFileUpload(formDataPart.name(),
           formDataPart.filename(), new File(formDataPart.pathname()),
           formDataPart.mediaType(), formDataPart.isText());
+      } else {
+        encoder.addBodyBinaryUpload(formDataPart.name(),
+          formDataPart.filename(), formDataPart.mediaType(), formDataPart.isText(), formDataPart.buffer());
       }
     }
     encoder.finalizeRequest();

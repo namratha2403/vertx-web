@@ -72,4 +72,15 @@ public interface FormDataPart {
   @CacheReturn
   Boolean isText();
 
+  /**
+   * @return buffer to upload
+   */
+  @CacheReturn
+  Object buffer();
+
+  /**
+   * @return returns weather its a buffer to upload
+   */
+  @CacheReturn
+  Boolean isBuffer();
 }

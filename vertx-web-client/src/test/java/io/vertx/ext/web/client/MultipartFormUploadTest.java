@@ -123,4 +123,38 @@ public class MultipartFormUploadTest {
       }
     });
   }
+
+  @Test
+  public void bufferUpload(TestContext ctx) throws Exception {
+    byte[] byteArray = TestUtils.randomByteArray(32 * 1024);
+    Async async = ctx.async();
+    Context context = vertx.getOrCreateContext();
+    context.runOnContext(v1 -> {
+      try {
+        MultipartFormUpload upload = new MultipartFormUpload(context, MultipartForm.create().binaryDataUpload(
+          "the-file",
+          "file",
+          "image/jpeg", byteArray), true, HttpPostRequestEncoder.EncoderMode.RFC1738);
+        List<Buffer> buffers = Collections.synchronizedList(new ArrayList<>());
+        AtomicInteger end = new AtomicInteger();
+        upload.endHandler(v2 -> {
+          assertEquals(0, end.getAndIncrement());
+          ctx.assertTrue(buffers.size() > 0);
+          async.complete();
+        });
+
+        upload.handler(buffer -> {
+          assertEquals(0, end.get());
+          assertEquals(true, buffer.length() > 0);
+          buffers.add(buffer);
+        });
+        upload.resume();
+        upload.run();
+
+      } catch (Exception e) {
+        ctx.fail(e);
+        throw new AssertionError(e);
+      }
+    });
+  }
 }

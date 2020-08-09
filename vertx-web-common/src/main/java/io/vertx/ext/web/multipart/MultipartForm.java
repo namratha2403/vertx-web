@@ -68,4 +68,7 @@ public interface MultipartForm extends Iterable<FormDataPart> {
   @Fluent
   MultipartForm binaryFileUpload(String name, String filename, String pathname, String mediaType);
 
+  @Fluent
+  MultipartForm binaryDataUpload(String name, String filename, String mediaType, Object byteBuf);
+
 }
