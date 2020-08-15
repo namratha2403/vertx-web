@@ -15,6 +15,8 @@
  */
 package io.vertx.ext.web.client;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.multipart.HttpPostRequestEncoder;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
@@ -127,6 +129,7 @@ public class MultipartFormUploadTest {
   @Test
   public void bufferUpload(TestContext ctx) throws Exception {
     byte[] byteArray = TestUtils.randomByteArray(32 * 1024);
+    ByteBuf byteBuf = Unpooled.wrappedBuffer(byteArray);
     Async async = ctx.async();
     Context context = vertx.getOrCreateContext();
     context.runOnContext(v1 -> {
@@ -134,7 +137,7 @@ public class MultipartFormUploadTest {
         MultipartFormUpload upload = new MultipartFormUpload(context, MultipartForm.create().binaryDataUpload(
           "the-file",
           "file",
-          "image/jpeg", byteArray), true, HttpPostRequestEncoder.EncoderMode.RFC1738);
+          "image/jpeg", byteBuf), true, HttpPostRequestEncoder.EncoderMode.RFC1738);
         List<Buffer> buffers = Collections.synchronizedList(new ArrayList<>());
         AtomicInteger end = new AtomicInteger();
         upload.endHandler(v2 -> {

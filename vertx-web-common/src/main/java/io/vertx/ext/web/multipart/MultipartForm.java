@@ -15,7 +15,9 @@
  */
 package io.vertx.ext.web.multipart;
 
+import io.netty.buffer.ByteBuf;
 import io.vertx.codegen.annotations.Fluent;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.ext.web.multipart.impl.MultipartFormImpl;
 
@@ -68,7 +70,16 @@ public interface MultipartForm extends Iterable<FormDataPart> {
   @Fluent
   MultipartForm binaryFileUpload(String name, String filename, String pathname, String mediaType);
 
-  @Fluent
-  MultipartForm binaryDataUpload(String name, String filename, String mediaType, Object byteBuf);
+  /***
+   * Add a binary buffer upload form data part
+   *
+   * @param name name of the parameter
+   * @param filename filename of the file
+   * @param mediaType the MIME type of the file
+   * @param byteBuf netty buffer to be uploaded
+   * @return a reference to this
+   */
+  @GenIgnore
+  MultipartForm binaryDataUpload(String name, String filename, String mediaType, ByteBuf byteBuf);
 
 }

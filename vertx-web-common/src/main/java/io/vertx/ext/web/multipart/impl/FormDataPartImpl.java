@@ -15,6 +15,7 @@
  */
 package io.vertx.ext.web.multipart.impl;
 
+import io.netty.buffer.ByteBuf;
 import io.vertx.ext.web.multipart.FormDataPart;
 
 public class FormDataPartImpl implements FormDataPart {
@@ -25,7 +26,7 @@ public class FormDataPartImpl implements FormDataPart {
   private final String mediaType;
   private final String pathname;
   private final Boolean text;
-  private final Object byteBuf;
+  private final ByteBuf byteBuf;
 
   public FormDataPartImpl(String name, String value) {
     if (name == null) {
@@ -65,7 +66,7 @@ public class FormDataPartImpl implements FormDataPart {
     this.byteBuf = null;
   }
 
-  public FormDataPartImpl(String name, String filename, String mediaType, boolean text, Object byteBuf) {
+  public FormDataPartImpl(String name, String filename, String mediaType, boolean text, ByteBuf byteBuf) {
     if (name == null) {
       throw new NullPointerException();
     }
@@ -126,7 +127,7 @@ public class FormDataPartImpl implements FormDataPart {
   }
 
   @Override
-  public Object buffer() {
+  public ByteBuf buffer() {
     return byteBuf;
   }
 

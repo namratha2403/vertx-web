@@ -15,6 +15,7 @@
  */
 package io.vertx.ext.web.multipart.impl;
 
+import io.netty.buffer.ByteBuf;
 import io.vertx.ext.web.multipart.FormDataPart;
 import io.vertx.ext.web.multipart.MultipartForm;
 
@@ -45,7 +46,7 @@ public class MultipartFormImpl implements MultipartForm {
   }
 
   @Override
-  public MultipartForm binaryDataUpload(String name, String filename, String mediaType, Object byteBuf) {
+  public MultipartForm binaryDataUpload(String name, String filename, String mediaType, ByteBuf byteBuf) {
     parts.add(new FormDataPartImpl(name, filename, mediaType, false, byteBuf));
     return this;
   }

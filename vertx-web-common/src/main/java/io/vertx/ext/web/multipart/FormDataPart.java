@@ -15,7 +15,9 @@
  */
 package io.vertx.ext.web.multipart;
 
+import io.netty.buffer.ByteBuf;
 import io.vertx.codegen.annotations.CacheReturn;
+import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.VertxGen;
 
 /**
@@ -76,7 +78,8 @@ public interface FormDataPart {
    * @return buffer to upload
    */
   @CacheReturn
-  Object buffer();
+  @GenIgnore
+  ByteBuf buffer();
 
   /**
    * @return returns weather its a buffer to upload

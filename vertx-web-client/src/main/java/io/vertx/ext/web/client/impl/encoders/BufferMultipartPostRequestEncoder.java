@@ -1,5 +1,6 @@
 package io.vertx.ext.web.client.impl.encoders;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.HttpConstants;
 import io.netty.handler.codec.http.HttpRequest;
@@ -8,9 +9,11 @@ import io.netty.handler.codec.http.multipart.HttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpPostRequestEncoder;
 import io.netty.util.internal.StringUtil;
 import java.io.IOException;
-
 import static io.netty.util.internal.ObjectUtil.checkNotNull;
 
+/***
+ * This is custom coder to upload byte buffer
+ */
 public class BufferMultipartPostRequestEncoder extends AbstractMultipartFormEncoder {
 
 
@@ -28,7 +31,7 @@ public class BufferMultipartPostRequestEncoder extends AbstractMultipartFormEnco
                                     String filename ,
                                     String contentType,
                                     boolean isText,
-                                    Object buffer) throws ErrorDataEncoderException {
+                                    ByteBuf buffer) throws ErrorDataEncoderException {
 
         checkNotNull(name, "name");
         checkNotNull(buffer, "buffer cannot be empty");
@@ -47,11 +50,10 @@ public class BufferMultipartPostRequestEncoder extends AbstractMultipartFormEnco
         if (!isText) {
           contentTransferEncoding = "binary";
         }
-        byte[] byteBuffer = (byte[])buffer;
         FileUpload fileUpload = factory.createFileUpload(request, name, filename, scontentType,
-                contentTransferEncoding, null, byteBuffer.length);
+                contentTransferEncoding, null, buffer.capacity());
         try {
-            fileUpload.setContent(Unpooled.wrappedBuffer(byteBuffer));
+            fileUpload.setContent(Unpooled.wrappedBuffer(buffer));
         } catch (IOException e) {
             throw new ErrorDataEncoderException(e);
         }
